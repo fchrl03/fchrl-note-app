@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from 'react';
+import { FormInput, Header, SectionNotes } from './components';
+import './styles/stylemain.css';
+import { getInitialData } from './utils';
 
 function App() {
+  const [query, setQuery] = useState('');
+  const [searchNotes, setSearchNotes] = useState([]);
+  const [notes, setNotes] = useState(getInitialData());
+
+  const activeNotes = (searchNotes || notes).filter((note) => !note.archived);
+  const archivedNotes = (searchNotes || notes).filter((note) => note.archived);
+
+  useEffect(() => {
+    setSearchNotes(notes.filter((note) => note.title.toLowerCase().includes(query.toLowerCase())));
+  }, [query, notes]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header search={query} updateQuery={setQuery} updateNotes={setNotes} />
+      <main className="main">
+        <FormInput updateNotes={setNotes} />
+        <SectionNotes label="Active Notes" notes={activeNotes} setNotes={setNotes} />
+        <SectionNotes label="Archived Notes" notes={archivedNotes} setNotes={setNotes} />
+      </main>
+    </>
   );
 }
 
